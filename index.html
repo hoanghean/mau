@@ -50,8 +50,8 @@
             <p id="rgbPercentages"></p>
         </div>
         <button onclick="copyToClipboard()">Copy mã màu</button>
-    </div>
-    <input type="file" id="imageInput" accept="image/*">
+    </div><br>
+    <input type="file" id="imageInput" accept="image/*"><br><br>
     <div id="imageContainer">
         <img id="selectedImage" alt="Selected Image">
     </div>
@@ -92,7 +92,7 @@
 
             colorDisplay.style.backgroundColor = hex;
             hexValue.textContent = `Mã màu: ${hex}`;
-            rgbPercentages.innerHTML = `R (đỏ): ${percentages.r}%,<br> G (xanh lá cây): ${percentages.g}%, <br> B (xanh dương): ${percentages.b}% <br>`;
+            rgbPercentages.innerHTML = `R (đỏ): ${percentages.r}%<br> G (xanh lá cây): ${percentages.g}% <br> B (xanh dương): ${percentages.b}% <br>`;
         });
 
         function rgbToHex(r, g, b) {
