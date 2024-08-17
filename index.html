@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Color Picker</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        #colorInfo {
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+        }
+        #colorDisplay {
+            width: 50px;
+            height: 50px;
+            border: 1px solid #000;
+            margin-right: 20px;
+        }
+        #colorDetails {
+            flex-grow: 1;
+        }
+        #imageContainer {
+            max-width: 100%;
+            position: relative;
+        }
+        #selectedImage {
+            max-width: 100%;
+        }
+        button {
+            margin-left: 10px;
+            padding: 5px 10px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <h1>Chọn một ảnh và click vào bất kỳ vị trí nào để xem mã màu</h1>
+            
+    <div id="colorInfo">
+        <div id="colorDisplay"></div>
+        <br><br><br>
+        <div id="colorDetails">
+            <p id="hexValue"></p>
+            <p id="rgbPercentages"></p>
+        </div>
+        <button onclick="copyToClipboard()">Copy mã màu</button>
+    </div>
+    <input type="file" id="imageInput" accept="image/*">
+    <div id="imageContainer">
+        <img id="selectedImage" alt="Selected Image">
+    </div>
+
+    <script>
+        const imageInput = document.getElementById('imageInput');
+        const selectedImage = document.getElementById('selectedImage');
+        const imageContainer = document.getElementById('imageContainer');
+        const colorDisplay = document.getElementById('colorDisplay');
+        const hexValue = document.getElementById('hexValue');
+        const rgbPercentages = document.getElementById('rgbPercentages');
+
+        imageInput.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    selectedImage.src = event.target.result;
+                }
+                reader.readAsDataURL(file);
+            }
+        });
+
+        imageContainer.addEventListener('click', function(e) {
+            const rect = selectedImage.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+
+            const canvas = document.createElement('canvas');
+            const context = canvas.getContext('2d');
+            canvas.width = selectedImage.width;
+            canvas.height = selectedImage.height;
+            context.drawImage(selectedImage, 0, 0, canvas.width, canvas.height);
+
+            const pixelData = context.getImageData(x, y, 1, 1).data;
+            const hex = rgbToHex(pixelData[0], pixelData[1], pixelData[2]);
+            const percentages = rgbToPercentages(pixelData[0], pixelData[1], pixelData[2]);
+
+            colorDisplay.style.backgroundColor = hex;
+            hexValue.textContent = `Mã màu: ${hex}`;
+            rgbPercentages.innerHTML = `R (đỏ): ${percentages.r}%,<br> G (xanh lá cây): ${percentages.g}%, <br> B (xanh dương): ${percentages.b}% <br>`;
+        });
+
+        function rgbToHex(r, g, b) {
+            return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1).toUpperCase();
+        }
+
+        function rgbToPercentages(r, g, b) {
+            const total = r + g + b;
+            return {
+                r: ((r / total) * 100).toFixed(2),
+                g: ((g / total) * 100).toFixed(2),
+                b: ((b / total) * 100).toFixed(2)
+            };
+        }
+
+        function copyToClipboard() {
+            const colorCode = hexValue.textContent.split(': ')[1];
+            navigator.clipboard.writeText(colorCode).then(() => {
+                alert('Đã copy mã màu: ' + colorCode);
+            });
+        }
+    </script>
+</body>
+</html>
